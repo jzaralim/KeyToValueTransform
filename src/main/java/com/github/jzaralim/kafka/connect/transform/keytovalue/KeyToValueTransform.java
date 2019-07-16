@@ -68,8 +68,8 @@ public class KeyToValueTransform<R extends ConnectRecord<R>> implements Transfor
       value = requireMap(record.value(), PURPOSE);
     }
     final Map<String, Object> key = new HashMap<String, Object>(1);
-    key.put("key", record.key());
-    value.put("key", record.key());
+    key.put("rowkey", record.key());
+    value.put("rowkey", record.key());
     return record.newRecord(
         record.topic(),
         record.kafkaPartition(),
@@ -92,7 +92,7 @@ public class KeyToValueTransform<R extends ConnectRecord<R>> implements Transfor
       for (Field field : value.schema().fields()) {
         valueSchemaBuilder.field(field.name(), field.schema());
       }
-      valueSchemaBuilder.field("key", record.keySchema());
+      valueSchemaBuilder.field("rowkey", record.keySchema());
       updatedSchema = valueSchemaBuilder.build();
 
       updatedSchemaCache.put(value.schema(), updatedSchema);
@@ -100,7 +100,7 @@ public class KeyToValueTransform<R extends ConnectRecord<R>> implements Transfor
 
     if (keySchema == null) {
       final SchemaBuilder keySchemaBuilder = SchemaBuilder.struct();
-      keySchemaBuilder.field("key", record.keySchema());
+      keySchemaBuilder.field("rowkey", record.keySchema());
       keySchema = keySchemaBuilder.build();
       valueToKeySchemaCache.put(value.schema(), keySchema);
     }
@@ -111,8 +111,8 @@ public class KeyToValueTransform<R extends ConnectRecord<R>> implements Transfor
       newValue.put(field.name(), value.get(field));
     }
 
-    key.put("key", record.key());
-    newValue.put("key", record.key());
+    key.put("rowkey", record.key());
+    newValue.put("rowkey", record.key());
 
     return record.newRecord(record.topic(), record.kafkaPartition(), keySchema, key, newValue.schema(), newValue, record.timestamp());
   }
